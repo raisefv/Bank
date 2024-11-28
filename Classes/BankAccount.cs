@@ -11,7 +11,7 @@ namespace Bank.Classes
         public string AccountNumber { get; set; }
         public DateTime OpenDate { get; set; }
         public Client AccountHolder { get; set; }
-        public decimal Balance { get; private set; }
+        public decimal Balance { get; set; }
         public DateTime EndDate { get; set; }
         public string Status { get; private set; }
 
@@ -24,10 +24,6 @@ namespace Bank.Classes
             EndDate = endDate;
             Status = " счет открыт";
         }
-        public void CalculateEndDate()
-        {
-            EndDate = OpenDate.AddYears(5);
-        }
 
         public void GenerateAccountNumber()
         {
@@ -37,43 +33,22 @@ namespace Bank.Classes
             AccountNumber = DigitOne.ToString() + DigitElse;
         }
 
-        public void UpdateStatus()
-        {
-            if (Balance < 0) { Status = "банкрот"; }
-        }
-
         public void CloseAccount()
         {
             Status = "счет закрыт";
             Balance = 0;
         }
 
-
         public void Deposit(decimal amount)
         {
             Balance += amount;
         }
 
-        public bool Withdraw(decimal amount)
+        public void Withdraw(decimal amount)
         {
-            if (amount <= Balance)
-            {
-                Balance -= amount;
-                return true;
-            }
-            else
-            return false;
+            Balance -= amount;
         }
 
-        public bool Transfer(decimal amount, BankAccount targetAccount)
-        {
-            if (Withdraw(amount))
-            {
-                targetAccount.Deposit(amount);
-                return true;
-            }
-            return false;
-        }
         public string OutputUser()
         {
             return "ФИО: " + this.AccountHolder.FullName + Environment.NewLine +

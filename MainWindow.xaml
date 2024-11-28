@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Управление счетами" Height="600" Width="800">
     <Grid>
-        <!-- Панель для переключения пользователей -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10">
             <Button Content="Пользователь 1" Width="150" Height="40" Margin="5"
                     Click="SwitchToUser1Button_Click" />
@@ -18,7 +17,6 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Надпись для пользователя 1 -->
             <TextBlock Text="Пользователь 1" FontSize="18" FontWeight="Bold" 
                        Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
@@ -49,6 +47,9 @@
                 <Button Grid.Row="3" Grid.Column="0" Content="Открыть счет" Width="150" Height="40" Margin="5"
                         Click="OpenAccountButton1_Click" />
 
+                <Button Content="Закрыть счет" Width="150" Height="40" Margin="10,5,440,5"
+                        Click="CloseAccountButton1_Click" Grid.Column="1" Grid.Row="3" />
+
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Сумма:" VerticalAlignment="Center" Margin="5" />
                 <TextBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="AmountTextBox1" />
 
@@ -57,8 +58,8 @@
                             Click="DepositButton1_Click" />
                     <Button Content="Снять средства" Width="150" Height="40" Margin="5"
                             Click="WithdrawButton1_Click" />
-                    <Button Content="Закрыть счет" Width="150" Height="40" Margin="5"
-                            Click="CloseAccountButton1_Click" />
+                    <Button Content="Перевести средства" Width="150" Height="40" Margin="5"
+                            Click="TransferButton1_Click" />
                 </StackPanel>
 
                 <TextBox Grid.Row="6" Grid.ColumnSpan="2" Margin="5" x:Name="OutputTextBox1"
@@ -74,7 +75,6 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Надпись для пользователя 2 -->
             <TextBlock Text="Пользователь 2" FontSize="18" FontWeight="Bold" 
                        Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
@@ -105,6 +105,9 @@
                 <Button Grid.Row="3" Grid.Column="0" Content="Открыть счет" Width="150" Height="40" Margin="5"
                         Click="OpenAccountButton2_Click" />
 
+                <Button Content="Закрыть счет" Width="150" Height="40" Margin="10,5,440,5"
+                        Click="CloseAccountButton2_Click" Grid.Column="1" Grid.Row="3" />
+
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Сумма:" VerticalAlignment="Center" Margin="5" />
                 <TextBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="AmountTextBox2" />
 
@@ -113,8 +116,8 @@
                             Click="DepositButton2_Click" />
                     <Button Content="Снять средства" Width="150" Height="40" Margin="5"
                             Click="WithdrawButton2_Click" />
-                    <Button Content="Закрыть счет" Width="150" Height="40" Margin="5"
-                            Click="CloseAccountButton2_Click" />
+                    <Button Content="Перевести средства" Width="150" Height="40" Margin="5"
+                            Click="TransferButton2_Click" />
                 </StackPanel>
 
                 <TextBox Grid.Row="6" Grid.ColumnSpan="2" Margin="5" x:Name="OutputTextBox2"
