@@ -34,7 +34,7 @@ namespace Bank
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(passport) || birthDate == null)
             {
-                MessageBox.Show("Пожалуйста, заполните все поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Пожалуйста, заполните все поля", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace Bank
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(passport) || birthDate == null)
             {
-                MessageBox.Show("Пожалуйста, заполните все поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Пожалуйста, заполните все поля", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace Bank
         {
             if (bankAccount1 == null)
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox1.Clear();
                 return;
             }
@@ -81,7 +81,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox1.Clear();
             }
         }
@@ -90,7 +90,7 @@ namespace Bank
         {
             if (bankAccount2 == null)
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox2.Clear();
                 return;
             }
@@ -103,7 +103,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox2.Clear();
             }
         }
@@ -112,7 +112,7 @@ namespace Bank
         {
             if (bankAccount1 == null || bankAccount1.Status == "счет закрыт")
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace Bank
             {
                 if (amount <= 0 || amount > bankAccount1.Balance)
                 {
-                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                     AmountTextBox1.Clear();
                     return;
                 }
@@ -131,7 +131,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox2.Clear();
             }
         }
@@ -140,7 +140,7 @@ namespace Bank
         {
             if (bankAccount2 == null || bankAccount2.Status == "счет закрыт")
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace Bank
             {
                 if (amount <= 0 || amount > bankAccount2.Balance)
                 {
-                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                     AmountTextBox2.Clear();
                     return;
                 }
@@ -159,7 +159,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox2.Clear();
             }
         }
@@ -168,7 +168,7 @@ namespace Bank
         {
             if (bankAccount1 == null)
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -181,7 +181,7 @@ namespace Bank
         {
             if (bankAccount2 == null)
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -194,7 +194,7 @@ namespace Bank
         {
             if (bankAccount1 == null || bankAccount1.Status == "счет закрыт")
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -202,7 +202,7 @@ namespace Bank
             {
                 if (amount <= 0 || amount > bankAccount1.Balance)
                 {
-                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                     AmountTextBox1.Clear();
                     return;
                 }
@@ -214,7 +214,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox1.Clear();
             }
         }
@@ -223,7 +223,7 @@ namespace Bank
         {
             if (bankAccount2 == null || bankAccount2.Status == "счет закрыт")
             {
-                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
@@ -231,7 +231,7 @@ namespace Bank
             {
                 if (amount <= 0 || amount > bankAccount2.Balance)
                 {
-                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                     AmountTextBox2.Clear();
                     return;
                 }
@@ -243,7 +243,7 @@ namespace Bank
             }
             else
             {
-                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox2.Clear();
             }
         }
