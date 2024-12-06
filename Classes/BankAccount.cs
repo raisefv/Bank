@@ -13,7 +13,9 @@ namespace Bank.Classes
         public Client AccountHolder { get; set; }
         public decimal Balance { get; set; }
         public DateTime EndDate { get; set; }
-        public string Status { get; private set; }
+        public AccountStatus Status { get; set; }
+
+        public enum AccountStatus { открыт, закрыт, банкрот }
 
         public BankAccount(string accountNumber, DateTime openDate, Client accountHolder, decimal initialBalance, DateTime endDate)
         {
@@ -22,7 +24,7 @@ namespace Bank.Classes
             AccountHolder = accountHolder;
             Balance = initialBalance;
             EndDate = endDate;
-            Status = " счет открыт";
+            Status = AccountStatus.открыт;
         }
 
         public void GenerateAccountNumber()
@@ -35,7 +37,7 @@ namespace Bank.Classes
 
         public void CloseAccount()
         {
-            Status = "счет закрыт";
+            Status = AccountStatus.закрыт;
             Balance = 0;
         }
 
@@ -56,7 +58,30 @@ namespace Bank.Classes
                 "Дата открытия счета: " + this.OpenDate + Environment.NewLine +
                 "Дата закрытия счета: " + this.EndDate + Environment.NewLine +
                 "Баланс: " + this.Balance + Environment.NewLine +
-                "Статус: " + this.Status + Environment.NewLine;
+                "Статус: счет " + this.Status + Environment.NewLine;
         }
+        public static BankAccount operator +(BankAccount account, decimal amount)
+        {
+            account.Balance += amount;
+            return account;
+        }
+
+        public static BankAccount operator -(BankAccount account, decimal amount)
+        {
+            account.Balance -= amount;
+            return account;
+        }
+
+        //public static bool operator ==(BankAccount account1, BankAccount account2)
+        //{
+        //    return ReferenceEquals(account1.Balance ,account2.Balance);
+        //}
+
+
+
+        //public static bool operator !=(BankAccount account1, BankAccount account2)
+        //{
+        //    return  account1.Balance != account2.Balance;
+        //}
     }
 }

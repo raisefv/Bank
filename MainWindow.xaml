@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Bank.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Управление счетами" Height="600" Width="800">
+        Title="IVANOV PDD" Height="600" Width="800">
     <Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10">
             <Button Content="Пользователь 1" Width="150" Height="40" Margin="5"
@@ -49,6 +49,9 @@
 
                 <Button Content="Закрыть счет" Width="150" Height="40" Margin="10,5,440,5"
                         Click="CloseAccountButton1_Click" Grid.Column="1" Grid.Row="3" />
+
+                <!--<Button Content="Сравнить счета" Width="150" Height="40" Margin="175,5,275,5"
+                        Click="EqualAccountButton1_Click" Grid.Column="1" Grid.Row="3" />-->
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Сумма:" VerticalAlignment="Center" Margin="5" />
                 <TextBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="AmountTextBox1" />
@@ -108,6 +111,9 @@
                 <Button Content="Закрыть счет" Width="150" Height="40" Margin="10,5,440,5"
                         Click="CloseAccountButton2_Click" Grid.Column="1" Grid.Row="3" />
 
+                <!--<Button Content="Сравнить счета" Width="150" Height="40" Margin="175,5,275,5"
+                        Click="EqualAccountButton2_Click" Grid.Column="1" Grid.Row="3" />-->
+                
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Сумма:" VerticalAlignment="Center" Margin="5" />
                 <TextBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="AmountTextBox2" />
 

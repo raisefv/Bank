@@ -40,21 +40,9 @@
               "RelativeDocumentMoniker": "Classes\\Client.cs",
               "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\Client.cs",
               "RelativeToolTip": "Classes\\Client.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-16T17:53:15.342Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "BankAccount.cs",
-              "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
-              "RelativeDocumentMoniker": "Classes\\BankAccount.cs",
-              "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
-              "RelativeToolTip": "Classes\\BankAccount.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAACQAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-16T17:55:04.852Z"
             },
             {
               "$type": "Document",
@@ -69,13 +57,25 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BankAccount.cs",
+              "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
+              "RelativeDocumentMoniker": "Classes\\BankAccount.cs",
+              "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
+              "RelativeToolTip": "Classes\\BankAccount.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAEQAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-16T17:55:04.852Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
               "ToolTip": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
               "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAAACAAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAAoBAAAAAAAAAAAAACABAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-16T17:52:38.972Z",
               "EditorCaption": ""

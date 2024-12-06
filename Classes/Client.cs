@@ -10,13 +10,13 @@ namespace Bank.Classes
     {
         public string FullName { get; set; }
         public string PassportNumber { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateBirth { get; set; }
 
-        public Client(string fullName, string passportNumber, DateTime dateOfBirth)
+        public Client(string fullName, string passportNumber, DateTime dateBirth)
         {
             FullName = fullName;
             PassportNumber = passportNumber;
-            DateOfBirth = dateOfBirth;
+            DateBirth = dateBirth;
         }
     }
 }

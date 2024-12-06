@@ -12,6 +12,11 @@ namespace Bank
         public MainWindow()
         {
             InitializeComponent();
+            BirthDatePicker1.DisplayDateEnd = DateTime.Now.AddYears(-14);
+            BirthDatePicker1.DisplayDateStart = DateTime.Now.AddYears(-100);
+            BirthDatePicker2.DisplayDateEnd = DateTime.Now.AddYears(-14);
+            BirthDatePicker2.DisplayDateStart = DateTime.Now.AddYears(-100);
+
         }
 
         private void SwitchToUser1Button_Click(object sender, RoutedEventArgs e)
@@ -30,7 +35,17 @@ namespace Bank
         {
             string fullName = FullNameTextBox1.Text;
             string passport = PassportTextBox1.Text;
-            DateTime? birthDate = BirthDatePicker1.SelectedDate;
+            DateTime birthDate = Convert.ToDateTime(BirthDatePicker1.SelectedDate);
+
+            for (int i = 0; i < fullName.Length; i++)
+            {
+                if (char.IsDigit(fullName[i]))
+                {
+                    MessageBox.Show("Поле ФИО не должо содержать цифр", "Ошибка", MessageBoxButton.OK);
+                    FullNameTextBox1.Text = null;
+                    return;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(passport) || birthDate == null)
             {
@@ -38,18 +53,32 @@ namespace Bank
                 return;
             }
 
-            Client client = new Client(fullName, passport, birthDate.Value);
+            Client client = new Client(fullName, passport, birthDate);
             bankAccount1 = new BankAccount(string.Empty, DateTime.Now, client, 0, DateTime.Now.AddYears(5));
             bankAccount1.GenerateAccountNumber();
 
             OutputTextBox1.Text = bankAccount1.OutputUser();
+
+            FullNameTextBox1.Clear();
+            PassportTextBox1.Clear();
+            BirthDatePicker1.SelectedDate = null;
         }
 
         private void OpenAccountButton2_Click(object sender, RoutedEventArgs e)
         {
             string fullName = FullNameTextBox2.Text;
             string passport = PassportTextBox2.Text;
-            DateTime? birthDate = BirthDatePicker2.SelectedDate;
+            DateTime birthDate = Convert.ToDateTime(BirthDatePicker2.SelectedDate);
+
+            for (int i = 0; i < fullName.Length; i++)
+            {
+                if (char.IsDigit(fullName[i]))
+                {
+                    MessageBox.Show("Поле ФИО не должо содержать цифр", "Ошибка", MessageBoxButton.OK);
+                    FullNameTextBox2.Text = null;
+                    return;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(passport) || birthDate == null)
             {
@@ -57,11 +86,15 @@ namespace Bank
                 return;
             }
 
-            Client client = new Client(fullName, passport, birthDate.Value);
+            Client client = new Client(fullName, passport, birthDate);
             bankAccount2 = new BankAccount(string.Empty, DateTime.Now, client, 0, DateTime.Now.AddYears(5));
             bankAccount2.GenerateAccountNumber();
 
             OutputTextBox2.Text = bankAccount2.OutputUser();
+
+            FullNameTextBox2.Clear();
+            PassportTextBox2.Clear();
+            BirthDatePicker2.SelectedDate = null;
         }
 
         private void DepositButton1_Click(object sender, RoutedEventArgs e)
@@ -75,7 +108,8 @@ namespace Bank
 
             if (decimal.TryParse(AmountTextBox1.Text, out decimal amount) && amount > 0)
             {
-                bankAccount1.Deposit(amount);
+                bankAccount1 += amount;
+                //bankAccount1.Deposit(amount);
                 OutputTextBox1.Text = bankAccount1.OutputUser();
                 AmountTextBox1.Clear();
             }
@@ -97,7 +131,8 @@ namespace Bank
 
             if (decimal.TryParse(AmountTextBox2.Text, out decimal amount) && amount > 0)
             {
-                bankAccount2.Deposit(amount);
+                bankAccount2 += amount;
+                //bankAccount2.Deposit(amount);
                 OutputTextBox2.Text = bankAccount2.OutputUser();
                 AmountTextBox2.Clear();
             }
@@ -110,7 +145,7 @@ namespace Bank
 
         private void WithdrawButton1_Click(object sender, RoutedEventArgs e)
         {
-            if (bankAccount1 == null || bankAccount1.Status == "счет закрыт")
+            if (bankAccount1 == null || bankAccount1.Status == BankAccount.AccountStatus.закрыт)
             {
                 MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -125,7 +160,8 @@ namespace Bank
                     return;
                 }
 
-                bankAccount1.Withdraw(amount);
+                bankAccount1 -= amount;
+                //bankAccount1.Withdraw(amount);
                 OutputTextBox1.Text = bankAccount1.OutputUser();
                 AmountTextBox1.Clear();
             }
@@ -138,7 +174,7 @@ namespace Bank
 
         private void WithdrawButton2_Click(object sender, RoutedEventArgs e)
         {
-            if (bankAccount2 == null || bankAccount2.Status == "счет закрыт")
+            if (bankAccount2 == null || bankAccount2.Status == BankAccount.AccountStatus.закрыт)
             {
                 MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -153,7 +189,8 @@ namespace Bank
                     return;
                 }
 
-                bankAccount2.Withdraw(amount);
+                bankAccount2 -= amount;
+                //bankAccount2.Withdraw(amount);
                 OutputTextBox2.Text = bankAccount2.OutputUser();
                 AmountTextBox2.Clear();
             }
@@ -163,7 +200,7 @@ namespace Bank
                 AmountTextBox2.Clear();
             }
         }
-        
+
         private void CloseAccountButton1_Click(object sender, RoutedEventArgs e)
         {
             if (bankAccount1 == null)
@@ -187,12 +224,14 @@ namespace Bank
 
             bankAccount2.CloseAccount();
             OutputTextBox2.Text = bankAccount2.OutputUser();
-            MessageBox.Show("Счет успешно закрыт.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Счет успешно закрыт.", "Информация", MessageBoxButton.OK);
         }
 
         private void TransferButton1_Click(object sender, RoutedEventArgs e)
         {
-            if (bankAccount1 == null || bankAccount1.Status == "счет закрыт")
+
+
+            if (bankAccount1 == null || bankAccount1.Status == BankAccount.AccountStatus.закрыт || bankAccount2 == null)
             {
                 MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -206,8 +245,11 @@ namespace Bank
                     AmountTextBox1.Clear();
                     return;
                 }
-                bankAccount1.Withdraw(amount);
-                bankAccount2.Deposit(amount);
+
+                bankAccount1 -= amount;
+                bankAccount2 += amount;
+                //bankAccount1.Withdraw(amount);
+                //bankAccount2.Deposit(amount);
                 OutputTextBox1.Text = bankAccount1.OutputUser();
                 OutputTextBox2.Text = bankAccount2.OutputUser();
                 AmountTextBox1.Clear();
@@ -221,7 +263,9 @@ namespace Bank
 
         private void TransferButton2_Click(object sender, RoutedEventArgs e)
         {
-            if (bankAccount2 == null || bankAccount2.Status == "счет закрыт")
+
+
+            if (bankAccount2 == null || bankAccount2.Status == BankAccount.AccountStatus.закрыт)
             {
                 MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -235,8 +279,11 @@ namespace Bank
                     AmountTextBox2.Clear();
                     return;
                 }
-                bankAccount2.Withdraw(amount);
-                bankAccount1.Deposit(amount);
+
+                bankAccount2 -= amount;
+                bankAccount1 += amount;
+                //bankAccount2.Withdraw(amount);
+                //bankAccount1.Deposit(amount);
                 OutputTextBox1.Text = bankAccount1.OutputUser();
                 OutputTextBox2.Text = bankAccount2.OutputUser();
                 AmountTextBox2.Clear();
@@ -247,5 +294,6 @@ namespace Bank
                 AmountTextBox2.Clear();
             }
         }
+
     }
 }
