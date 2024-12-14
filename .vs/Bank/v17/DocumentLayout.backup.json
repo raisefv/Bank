@@ -15,6 +15,10 @@
       "RelativeMoniker": "D:0:0:{5344F0AD-07BE-456B-AEF5-15B728D4E7C8}|Bank.csproj|solutionrelative:classes\\bankaccount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{5344F0AD-07BE-456B-AEF5-15B728D4E7C8}|Bank.csproj|C:\\vss\\cs\\Bank\\classes\\transactions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5344F0AD-07BE-456B-AEF5-15B728D4E7C8}|Bank.csproj|solutionrelative:classes\\transactions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5344F0AD-07BE-456B-AEF5-15B728D4E7C8}|Bank.csproj|C:\\vss\\cs\\Bank\\classes\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5344F0AD-07BE-456B-AEF5-15B728D4E7C8}|Bank.csproj|solutionrelative:classes\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -26,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -35,14 +39,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Client.cs",
-              "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\Client.cs",
-              "RelativeDocumentMoniker": "Classes\\Client.cs",
-              "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\Client.cs",
-              "RelativeToolTip": "Classes\\Client.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Title": "Transactions.cs",
+              "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\Transactions.cs",
+              "RelativeDocumentMoniker": "Classes\\Transactions.cs",
+              "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\Transactions.cs",
+              "RelativeToolTip": "Classes\\Transactions.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAowCcAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-16T17:53:15.342Z"
+              "WhenOpened": "2024-12-10T17:12:12.865Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "MainWindow.xaml.cs",
+              "ToolTip": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
+              "RelativeToolTip": "MainWindow.xaml.cs",
+              "ViewState": "AgIAAIYAAAAAAAAAAADwv64AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-16T17:52:38.972Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -57,28 +74,27 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Client.cs",
+              "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\Client.cs",
+              "RelativeDocumentMoniker": "Classes\\Client.cs",
+              "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\Client.cs",
+              "RelativeToolTip": "Classes\\Client.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-16T17:53:15.342Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
               "Title": "BankAccount.cs",
               "DocumentMoniker": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
               "RelativeDocumentMoniker": "Classes\\BankAccount.cs",
               "ToolTip": "C:\\vss\\cs\\Bank\\Classes\\BankAccount.cs",
               "RelativeToolTip": "Classes\\BankAccount.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAAEQAAAA8AAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAADcAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-16T17:55:04.852Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "MainWindow.xaml.cs",
-              "ToolTip": "C:\\vss\\cs\\Bank\\MainWindow.xaml.cs",
-              "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAAoBAAAAAAAAAAAAACABAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-16T17:52:38.972Z",
-              "EditorCaption": ""
             }
           ]
         }

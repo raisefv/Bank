@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Bank.Classes
 {
@@ -16,7 +17,6 @@ namespace Bank.Classes
         public AccountStatus Status { get; set; }
 
         public enum AccountStatus { открыт, закрыт, банкрот }
-
         public BankAccount(string accountNumber, DateTime openDate, Client accountHolder, decimal initialBalance, DateTime endDate)
         {
             AccountNumber = accountNumber;
@@ -26,7 +26,6 @@ namespace Bank.Classes
             EndDate = endDate;
             Status = AccountStatus.открыт;
         }
-
         public void GenerateAccountNumber()
         {
             Random random = new Random();
@@ -34,29 +33,18 @@ namespace Bank.Classes
             string DigitElse = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
             AccountNumber = DigitOne.ToString() + DigitElse;
         }
-
         public void CloseAccount()
         {
             Status = AccountStatus.закрыт;
             Balance = 0;
         }
-
-        public void Deposit(decimal amount)
-        {
-            Balance += amount;
-        }
-
-        public void Withdraw(decimal amount)
-        {
-            Balance -= amount;
-        }
-
         public string OutputUser()
-        {
+        { 
             return "ФИО: " + this.AccountHolder.FullName + Environment.NewLine +
+                "Дата рождения: " + this.AccountHolder.DateBirth.ToString("dd-MM-yyyy") + Environment.NewLine +
                 "Номер счета: " + this.AccountNumber + Environment.NewLine +
-                "Дата открытия счета: " + this.OpenDate + Environment.NewLine +
-                "Дата закрытия счета: " + this.EndDate + Environment.NewLine +
+                "Дата открытия счета: " + this.OpenDate.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine +
+                "Дата закрытия счета: " + this.EndDate.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine +
                 "Баланс: " + this.Balance + Environment.NewLine +
                 "Статус: счет " + this.Status + Environment.NewLine;
         }
@@ -65,23 +53,10 @@ namespace Bank.Classes
             account.Balance += amount;
             return account;
         }
-
         public static BankAccount operator -(BankAccount account, decimal amount)
         {
             account.Balance -= amount;
             return account;
         }
-
-        //public static bool operator ==(BankAccount account1, BankAccount account2)
-        //{
-        //    return ReferenceEquals(account1.Balance ,account2.Balance);
-        //}
-
-
-
-        //public static bool operator !=(BankAccount account1, BankAccount account2)
-        //{
-        //    return  account1.Balance != account2.Balance;
-        //}
     }
 }
