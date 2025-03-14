@@ -13,12 +13,14 @@ namespace Bank.Classes
         public string FullName { get; set; }
         public string PassportNumber { get; set; }
         public DateTime DateBirth { get; set; }
-        public decimal Balance { get; set; }
+        public double Balance { get; set; }
         public DateTime EndDate { get; set; }
         public AccountStatus Status { get; set; }
+        public List<BankCard> Cards { get; set; } = new List<BankCard>();
 
         public enum AccountStatus { открыт, закрыт, банкрот }
-        public BankAccount(string accountNumber, DateTime openDate, string fullName, string passportNumber, DateTime dateBirth, decimal balance, DateTime endDate)
+
+        public BankAccount(string accountNumber, DateTime openDate, string fullName, string passportNumber, DateTime dateBirth, double balance, DateTime endDate)
         {
             AccountNumber = accountNumber;
             OpenDate = openDate;
@@ -29,6 +31,10 @@ namespace Bank.Classes
             EndDate = endDate;
             Status = AccountStatus.открыт;
         }
+        public void AddCard(BankCard card)
+        {
+            Cards.Add(card);
+        }
 
         public void GenerateAccountNumber()
         {
@@ -37,11 +43,13 @@ namespace Bank.Classes
             string DigitElse = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
             AccountNumber = DigitOne.ToString() + DigitElse;
         }
+
         public void CloseAccount()
         {
             Status = AccountStatus.закрыт;
             Balance = 0;
         }
+
         public string OutputUser()
         {
             return "ФИО: " + this.FullName + Environment.NewLine +
@@ -52,12 +60,14 @@ namespace Bank.Classes
                 "Баланс: " + this.Balance + Environment.NewLine +
                 "Статус: счет " + this.Status + Environment.NewLine;
         }
-        public static BankAccount operator +(BankAccount account, decimal amount)
+
+        public static BankAccount operator +(BankAccount account, double amount)
         {
             account.Balance += amount;
             return account;
         }
-        public static BankAccount operator -(BankAccount account, decimal amount)
+
+        public static BankAccount operator -(BankAccount account, double amount)
         {
             account.Balance -= amount;
             return account;

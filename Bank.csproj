@@ -67,6 +67,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\BankAccount.cs" />
+    <Compile Include="Classes\BankCard.cs" />
     <Compile Include="Classes\Transactions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -1,0 +1,58 @@
+[
+  {
+    "AccountNumber": "225108720375",
+    "OpenDate": "2025-03-06T21:22:44.4034788+03:00",
+    "FullName": "ali",
+    "PassportNumber": "245742",
+    "DateBirth": "2011-03-02T00:00:00",
+    "Balance": 125.0,
+    "EndDate": "2035-03-06T21:22:44.4034788+03:00",
+    "Status": 0,
+    "Cards": [
+      {
+        "CardNumber": "7260396331693691",
+        "CardBalance": 125.0,
+        "PinCode": 1234,
+        "PhoneNumber": "+71234567899",
+        "CashbackPercentage": 3.0,
+        "AccountNumber": "225108720375",
+        "OpenDate": "2025-03-06T21:23:02.3074303+03:00",
+        "FullName": "ali",
+        "PassportNumber": "245742",
+        "DateBirth": "2011-03-02T00:00:00",
+        "Balance": 0.0,
+        "EndDate": "2030-03-06T21:23:02.3074303+03:00",
+        "Status": 0,
+        "Cards": []
+      }
+    ]
+  },
+  {
+    "AccountNumber": "894899318349",
+    "OpenDate": "2025-03-06T22:28:11.5712529+03:00",
+    "FullName": "dima",
+    "PassportNumber": "435234234",
+    "DateBirth": "2011-03-02T00:00:00",
+    "Balance": 875.0,
+    "EndDate": "2035-03-06T22:28:11.5712529+03:00",
+    "Status": 0,
+    "Cards": [
+      {
+        "CardNumber": "1276119113030787",
+        "CardBalance": 875.0,
+        "PinCode": 1234,
+        "PhoneNumber": "+71234567890",
+        "CashbackPercentage": 3.0,
+        "AccountNumber": "894899318349",
+        "OpenDate": "2025-03-06T22:28:36.5052634+03:00",
+        "FullName": "dima",
+        "PassportNumber": "435234234",
+        "DateBirth": "2011-03-02T00:00:00",
+        "Balance": 0.0,
+        "EndDate": "2030-03-06T22:28:36.5052634+03:00",
+        "Status": 0,
+        "Cards": []
+      }
+    ]
+  }
+]
