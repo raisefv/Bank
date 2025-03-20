@@ -1,76 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Bank.Classes
+public class BankAccount
 {
-    class BankAccount
+    public string AccountNumber { get; private set; }
+    public DateTime OpenDate { get; private set; }
+    public string FullName { get; private set; }
+    public string PassportNumber { get; private set; }
+    public DateTime DateBirth { get; private set; }
+    public double Balance { get; set; }
+    public DateTime EndDate { get; private set; }
+    public AccountStatus Status { get; private set; }
+    public List<BankCard> Cards { get; private set; } = new List<BankCard>();
+
+    public enum AccountStatus { Открыт, Закрыт, Банкрот }
+
+    public BankAccount(string accountNumber, DateTime openDate, string fullName, string passportNumber, DateTime dateBirth, double balance, DateTime endDate)
     {
-        public string AccountNumber { get; set; }
-        public DateTime OpenDate { get; set; }
-        public string FullName { get; set; }
-        public string PassportNumber { get; set; }
-        public DateTime DateBirth { get; set; }
-        public double Balance { get; set; }
-        public DateTime EndDate { get; set; }
-        public AccountStatus Status { get; set; }
-        public List<BankCard> Cards { get; set; } = new List<BankCard>();
+        AccountNumber = accountNumber;
+        OpenDate = openDate;
+        FullName = fullName;
+        PassportNumber = passportNumber;
+        DateBirth = dateBirth;
+        EndDate = endDate;
+        Status = AccountStatus.Открыт;
+        Balance = balance;
+    }
 
-        public enum AccountStatus { открыт, закрыт, банкрот }
+    public void AddCard(BankCard card)
+    {
+        if (card == null)
+            throw new ArgumentNullException(nameof(card), "Карта не может быть null.");
 
-        public BankAccount(string accountNumber, DateTime openDate, string fullName, string passportNumber, DateTime dateBirth, double balance, DateTime endDate)
-        {
-            AccountNumber = accountNumber;
-            OpenDate = openDate;
-            FullName = fullName;
-            PassportNumber = passportNumber;
-            DateBirth = dateBirth;
-            Balance = balance;
-            EndDate = endDate;
-            Status = AccountStatus.открыт;
-        }
-        public void AddCard(BankCard card)
-        {
-            Cards.Add(card);
-        }
+        Cards.Add(card);
+        UpdateAccountBalance();
+    }
 
-        public void GenerateAccountNumber()
-        {
-            Random random = new Random();
-            int DigitOne = random.Next(1, 10);
-            string DigitElse = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
-            AccountNumber = DigitOne.ToString() + DigitElse;
-        }
+    public void UpdateAccountBalance()
+    {
+        Balance = Cards.Sum(card => card.CardBalance);
+    }
 
-        public void CloseAccount()
-        {
-            Status = AccountStatus.закрыт;
-            Balance = 0;
-        }
+    public static string GenerateAccountNumber()
+    {
+        Random random = new Random();
+        int firstDigit = random.Next(1, 10);
+        string otherDigits = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
+        return firstDigit.ToString() + otherDigits;
+    }
 
-        public string OutputUser()
-        {
-            return "ФИО: " + this.FullName + Environment.NewLine +
-                "Дата рождения: " + this.DateBirth.ToString("dd-MM-yyyy") + Environment.NewLine +
-                "Номер счета: " + this.AccountNumber + Environment.NewLine +
-                "Дата открытия счета: " + this.OpenDate.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine +
-                "Дата закрытия счета: " + this.EndDate.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine +
-                "Баланс: " + this.Balance + Environment.NewLine +
-                "Статус: счет " + this.Status + Environment.NewLine;
-        }
+    public void CloseAccount()
+    {
+        if (Balance > 0)
+            throw new InvalidOperationException("Нельзя закрыть счет с ненулевым балансом.");
 
-        public static BankAccount operator +(BankAccount account, double amount)
-        {
-            account.Balance += amount;
-            return account;
-        }
+        Status = AccountStatus.Закрыт;
+    }
 
-        public static BankAccount operator -(BankAccount account, double amount)
-        {
-            account.Balance -= amount;
-            return account;
-        }
+    public string GetAccountInfo()
+    {
+        return $"ФИО: {FullName}{Environment.NewLine}" +
+               $"Текущий баланс счета: {Balance}{Environment.NewLine}" +
+               $"Паспорт: {PassportNumber}{Environment.NewLine}" +
+               $"Дата рождения: {DateBirth:dd-MM-yyyy}{Environment.NewLine}" +
+               $"Дата открытия счета: {OpenDate:dd-MM-yyyy}{Environment.NewLine}" +
+               $"Номер счета: {AccountNumber}{Environment.NewLine}" +
+               $"Статус счета: {Status}{Environment.NewLine}";
+    }
+
+    public static BankAccount operator +(BankAccount account, double amount)
+    {
+        if (amount < 0)
+            throw new ArgumentException("Сумма пополнения должна быть положительной.");
+
+        account.Balance += amount;
+        return account;
+    }
+
+    public static BankAccount operator -(BankAccount account, double amount)
+    {
+        if (amount < 0)
+            throw new ArgumentException("Сумма списания должна быть положительной.");
+
+        if (amount > account.Balance)
+            throw new InvalidOperationException("Недостаточно средств на счете.");
+
+        account.Balance -= amount;
+        return account;
     }
 }

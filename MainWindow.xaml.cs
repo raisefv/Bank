@@ -56,8 +56,7 @@ namespace Bank
                 return;
             }
 
-            var bankAccount = new BankAccount(string.Empty, DateTime.Now, fullName, passport, birthDate.Value, 0, DateTime.Now.AddYears(10));
-            bankAccount.GenerateAccountNumber();
+            var bankAccount = new BankAccount(BankAccount.GenerateAccountNumber(), DateTime.Now, fullName, passport, birthDate.Value, 0, DateTime.Now.AddYears(10));
             BankAccounts.Add(bankAccount);
 
             UpdateUserComboBox();
@@ -71,355 +70,328 @@ namespace Bank
 
         private void CloseAccountButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null)
+            if (UserComboBox.SelectedItem == null)
             {
-                string selectedUserName = UserComboBox.SelectedItem.ToString();
-                var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == selectedUserName);
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
-
-                if (selectedAccount != null && selectedAccount.Status != BankAccount.AccountStatus.закрыт)
-                {
-                    selectedAccount.CloseAccount();
-
-                    OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                        $"ФИО: {selectedUser.FullName}" + Environment.NewLine +
-                                                        $"Текущий баланс: {selectedAccount.Balance}" + Environment.NewLine +
-                                                        $"Паспорт: {selectedUser.PassportNumber}" + Environment.NewLine +
-                                                        $"Дата рождения: {selectedUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата открытия счета: {selectedAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата закрытия счета: {selectedAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Номер счета: {selectedAccount.AccountNumber}" + Environment.NewLine +
-                                                        $"Статус счета: {selectedAccount.Status}" + Environment.NewLine;
-
-                    MessageBox.Show("Счет успешно закрыт.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Счет уже закрыт или не существует.", "Ошибка", MessageBoxButton.OK);
-                }
+                MessageBox.Show("Выберите пользователя!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
+
+            string selectedUserName = UserComboBox.SelectedItem.ToString();
+            var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
+
+            if (selectedAccount == null)
+            {
+                MessageBox.Show("Ошибка: Счет не найден!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (selectedAccount.Status == BankAccount.AccountStatus.Закрыт)
+            {
+                MessageBox.Show("Счет уже закрыт.", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            selectedAccount.CloseAccount();
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine + 
+                                    selectedAccount.GetAccountInfo();
+
+            MessageBox.Show("Счет успешно закрыт.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void DepositButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null && CardComboBox.SelectedItem != null &&
-                double.TryParse(AmountTextBox.Text, out double amount) && amount > 0)
+            if (UserComboBox.SelectedItem == null || CardComboBox.SelectedItem == null)
             {
-                string selectedUserName = UserComboBox.SelectedItem.ToString();
-                var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == selectedUserName);
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
-                var selectedCard = selectedAccount?.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
-
-                if (selectedAccount != null && selectedCard != null)
-                {
-                    if (string.IsNullOrEmpty(CardPINTextBox.Text))
-                    {
-                        MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (Convert.ToInt64(CardPINTextBox.Text) == selectedCard.PinCode)
-                    {
-                        selectedCard.Deposit(amount);
-                        selectedAccount.Balance += amount;
-
-                        Transactions newTransaction = new Transactions(
-                            accountNumber: selectedAccount.AccountNumber,
-                            operation: Transactions.OperationType.Снятие,
-                            timestamp: DateTime.Now,
-                            isSuccessful: true,
-                            amount: amount,
-                            getterAccountNumber: "",
-                            senderAccountName: "",
-                            getterAccountName: "");
-
-                        AddTransaction(newTransaction);
-
-                        OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                        $"ФИО: {selectedUser.FullName}" + Environment.NewLine +
-                                                        $"Текущий баланс: {selectedAccount.Balance}" + Environment.NewLine +
-                                                        $"Паспорт: {selectedUser.PassportNumber}" + Environment.NewLine +
-                                                        $"Дата рождения: {selectedUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата открытия счета: {selectedAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата закрытия счета: {selectedAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Номер счета: {selectedAccount.AccountNumber}" + Environment.NewLine +
-                                                        $"Статус счета: {selectedAccount.Status}" + Environment.NewLine +
-                                                        Environment.NewLine +
-                                                        $"Номер телефона: {selectedCard.PhoneNumber}" + Environment.NewLine +
-                                                        $"Номер карты: {selectedCard.CardNumber}" + Environment.NewLine +
-                                                        $"Баланс карты: {selectedCard.CardBalance}" + Environment.NewLine;
-
-                        MessageBox.Show("Операция выполнена успешно!", "Успех", MessageBoxButton.OK);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
-                    }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
-                    }
-
-                    AmountTextBox.Clear();
-                    CardPINTextBox.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("Сначала откройте счет и выберите карту!", "Ошибка", MessageBoxButton.OK);
-                }
+                MessageBox.Show("Сначала выберите пользователя и карту!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
+
+            if (!double.TryParse(AmountTextBox.Text, out double amount) || amount <= 0)
+            {
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            string selectedUserName = UserComboBox.SelectedItem.ToString();
+            var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
+
+            if (selectedAccount == null)
+            {
+                MessageBox.Show("Ошибка при поиске счета!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
+
+            if (selectedCard == null)
+            {
+                MessageBox.Show("Ошибка при поиске карты!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CardPINTextBox.Text) || !int.TryParse(CardPINTextBox.Text, out int enteredPin))
+            {
+                MessageBox.Show("Введите корректный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (enteredPin != selectedCard.PinCode)
+            {
+                MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            selectedCard.Deposit(amount);
+            selectedAccount.Balance += amount;
+
+            Transactions newTransaction = new Transactions(
+                accountNumber: selectedAccount.AccountNumber,
+                operation: Transactions.OperationType.Пополнение,
+                timestamp: DateTime.Now,
+                isSuccessful: true,
+                amount: amount,
+                getterAccountNumber: selectedAccount.AccountNumber,
+                senderAccountName: selectedUserName,
+                getterAccountName: selectedUserName);
+
+            AddTransaction(newTransaction);
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
+                         selectedAccount.GetAccountInfo() + Environment.NewLine +
+                         selectedCard.GetCardInfo();
+
+            MessageBox.Show("Операция выполнена успешно!", "Успех", MessageBoxButton.OK);
+
+            AmountTextBox.Clear();
+            CardPINTextBox.Clear();
+        }
 
         private void WithdrawButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null && CardComboBox.SelectedItem != null &&
-                double.TryParse(AmountTextBox.Text, out double amount) && amount > 0)
+            if (UserComboBox.SelectedItem == null || CardComboBox.SelectedItem == null)
             {
-                string selectedUserName = UserComboBox.SelectedItem.ToString();
-                var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == selectedUserName);
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
-                var selectedCard = selectedAccount?.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
-
-                if (selectedAccount != null && selectedCard != null)
-                {
-                    if (string.IsNullOrEmpty(CardPINTextBox.Text))
-                    {
-                        MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
-                        return;
-                    }
-
-                    if (Convert.ToInt64(CardPINTextBox.Text) == selectedCard.PinCode)
-                    {
-                        if (selectedCard.CardBalance >= amount)
-                        {
-                            selectedCard.Withdraw(amount);
-                            selectedAccount.Balance -= amount;
-
-                            Transactions newTransaction = new Transactions(
-                                accountNumber: selectedAccount.AccountNumber,
-                                operation: Transactions.OperationType.Снятие,
-                                timestamp: DateTime.Now,
-                                isSuccessful: true,
-                                amount: amount,
-                                getterAccountNumber: "",
-                                senderAccountName: "",
-                                getterAccountName: "");
-
-                            AddTransaction(newTransaction);
-
-                            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                        $"ФИО: {selectedUser.FullName}" + Environment.NewLine +
-                                                        $"Текущий баланс: {selectedAccount.Balance}" + Environment.NewLine +
-                                                        $"Паспорт: {selectedUser.PassportNumber}" + Environment.NewLine +
-                                                        $"Дата рождения: {selectedUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата открытия счета: {selectedAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата закрытия счета: {selectedAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Номер счета: {selectedAccount.AccountNumber}" + Environment.NewLine +
-                                                        $"Статус счета: {selectedAccount.Status}" + Environment.NewLine +
-                                                        Environment.NewLine +
-                                                        $"Номер телефона: {selectedCard.PhoneNumber}" + Environment.NewLine +
-                                                        $"Номер карты: {selectedCard.CardNumber}" + Environment.NewLine +
-                                                        $"Баланс карты: {selectedCard.CardBalance}" + Environment.NewLine;
-
-                            MessageBox.Show("Операция выполнена успешно!", "Успех", MessageBoxButton.OK);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
-                    }
-
-                    AmountTextBox.Clear();
-                    CardPINTextBox.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("Сначала откройте счет и выберите карту!", "Ошибка", MessageBoxButton.OK);
-                }
+                MessageBox.Show("Сначала выберите пользователя и карту!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
-            else
+
+            if (!double.TryParse(AmountTextBox.Text, out double amount) || amount <= 0)
             {
                 MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
-                AmountTextBox.Clear();
+                return;
             }
+
+            string selectedUserName = UserComboBox.SelectedItem.ToString();
+            var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
+
+            if (selectedAccount == null)
+            {
+                MessageBox.Show("Ошибка при поиске счета!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
+
+            if (selectedCard == null)
+            {
+                MessageBox.Show("Ошибка при поиске карты!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CardPINTextBox.Text) || !int.TryParse(CardPINTextBox.Text, out int enteredPin))
+            {
+                MessageBox.Show("Введите корректный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (enteredPin != selectedCard.PinCode)
+            {
+                MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (selectedCard.CardBalance < amount)
+            {
+                MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            selectedCard.Withdraw(amount);
+            selectedAccount.Balance -= amount;
+
+            Transactions newTransaction = new Transactions(
+                accountNumber: selectedAccount.AccountNumber,
+                operation: Transactions.OperationType.Снятие,
+                timestamp: DateTime.Now,
+                isSuccessful: true,
+                amount: amount,
+                getterAccountNumber: "",
+                senderAccountName: selectedUserName,
+                getterAccountName: "");
+
+            AddTransaction(newTransaction);
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
+                                     selectedAccount.GetAccountInfo() + Environment.NewLine +
+                                     selectedCard.GetCardInfo();
+
+            MessageBox.Show("Операция выполнена успешно!", "Успех", MessageBoxButton.OK);
+
+            AmountTextBox.Clear();
+            CardPINTextBox.Clear();
         }
 
         private void TransferButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null && UserComboBox2.SelectedItem != null && double.TryParse(AmountTextBox.Text, out double amount) && amount > 0)
+            if (UserComboBox.SelectedItem == null || UserComboBox2.SelectedItem == null)
             {
-                string senderUserName = UserComboBox.SelectedItem.ToString();
-                string receiverUserName = UserComboBox2.SelectedItem.ToString();
-
-                var senderUser = BankAccounts.FirstOrDefault(user => user.FullName == senderUserName);
-                var senderAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == senderUserName);
-                var senderCard = senderAccount?.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
-
-                var receiverUser = BankAccounts.FirstOrDefault(user => user.FullName == receiverUserName);
-                var receiverAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == receiverUserName);
-                var receiverCard = receiverAccount?.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox2.SelectedItem.ToString());
-
-                if (UserComboBox.SelectedItem != UserComboBox2.SelectedItem)
-                {
-                    if (senderCard != null && receiverCard != null)
-                    {
-                        if (string.IsNullOrEmpty(CardPINTextBox.Text))
-                        {
-                            MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
-                            return;
-                        }
-
-                        if (Convert.ToInt64(CardPINTextBox.Text) == senderCard.PinCode)
-                        {
-                            if (amount <= senderCard.CardBalance)
-                            {
-                                senderAccount.Balance -= amount;
-                                senderCard.CardBalance -= amount;
-                                receiverAccount.Balance += amount;
-                                receiverCard.CardBalance += amount;
-
-                                Transactions newTransaction = new Transactions(
-                                 accountNumber: senderAccount.AccountNumber,
-                                 operation: Transactions.OperationType.Перевод,
-                                 timestamp: DateTime.Now,
-                                 isSuccessful: true,
-                                 amount: amount,
-                                 getterAccountNumber: receiverAccount.AccountNumber,
-                                 senderAccountName: senderUserName,
-                                 getterAccountName: receiverUserName);
-
-                                AddTransaction(newTransaction);
-
-                                OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                     $"ФИО: {senderUser.FullName}" + Environment.NewLine +
-                                                     $"Текущий баланс: {senderAccount.Balance}" + Environment.NewLine +
-                                                     $"Паспорт: {senderUser.PassportNumber}" + Environment.NewLine +
-                                                     $"Дата рождения: {senderUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Дата открытия счета: {senderAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Дата закрытия счета: {senderAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Номер счета: {senderAccount.AccountNumber}" + Environment.NewLine +
-                                                     $"Статус счета: {senderAccount.Status}" + Environment.NewLine +
-                                                     Environment.NewLine +
-                                                     $"Номер телефона: {senderCard.PhoneNumber}" + Environment.NewLine +
-                                                     $"Номер карты: {senderCard.CardNumber}" + Environment.NewLine +
-                                                     $"Баланс карты: {senderCard.CardBalance}" + Environment.NewLine;
-
-                                OutputUserTextBox2.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                     $"ФИО: {receiverUser.FullName}" + Environment.NewLine +
-                                                     $"Текущий баланс: {receiverAccount.Balance}" + Environment.NewLine +
-                                                     $"Паспорт: {receiverUser.PassportNumber}" + Environment.NewLine +
-                                                     $"Дата рождения: {receiverUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Дата открытия счета: {receiverAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Дата закрытия счета: {receiverAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                     $"Номер счета: {receiverAccount.AccountNumber}" + Environment.NewLine +
-                                                     $"Статус счета: {receiverAccount.Status}" + Environment.NewLine +
-                                                     Environment.NewLine +
-                                                     $"Номер телефона: {receiverCard.PhoneNumber}" + Environment.NewLine +
-                                                     $"Номер карты: {receiverCard.CardNumber}" + Environment.NewLine +
-                                                     $"Баланс карты: {receiverCard.CardBalance}" + Environment.NewLine; ;
-
-                                AmountTextBox.Clear();
-                            }
-                            else
-                            {
-                                MessageBox.Show("Недостаточно средств для перевода!", "Ошибка", MessageBoxButton.OK);
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
-                        }
-
-                        AmountTextBox.Clear();
-                        CardPINTextBox.Clear();
-                    }
-                            
-                    else
-                    {
-                        MessageBox.Show("Оба пользователя должны иметь открытые счета!", "Ошибка", MessageBoxButton.OK);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Пользователь не может перевести средства сам себе!", "Ошибка", MessageBoxButton.OK);
-                }
+                MessageBox.Show("Выберите обоих пользователей!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
-            else
+
+            if (!double.TryParse(AmountTextBox.Text, out double amount) || amount <= 0)
             {
-                MessageBox.Show("Введите корректную сумму и выберите обоих пользователей!", "Ошибка", MessageBoxButton.OK);
+                MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
+
+            string senderUserName = UserComboBox.SelectedItem.ToString();
+            string receiverUserName = UserComboBox2.SelectedItem.ToString();
+
+            if (senderUserName == receiverUserName)
+            {
+                MessageBox.Show("Нельзя перевести средства самому себе!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            var senderAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == senderUserName);
+            var receiverAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == receiverUserName);
+
+            if (senderAccount == null || receiverAccount == null)
+            {
+                MessageBox.Show("Оба пользователя должны иметь открытые счета!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            var senderCard = senderAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem?.ToString());
+            var receiverCard = receiverAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox2.SelectedItem?.ToString());
+
+            if (senderCard == null || receiverCard == null)
+            {
+                MessageBox.Show("Выберите корректные карты отправителя и получателя!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CardPINTextBox.Text))
+            {
+                MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (Convert.ToInt64(CardPINTextBox.Text) != senderCard.PinCode)
+            {
+                MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (amount > senderCard.CardBalance)
+            {
+                MessageBox.Show("Недостаточно средств для перевода!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            senderCard.Withdraw(amount);
+            senderAccount.Balance -= amount;
+            receiverCard.Deposit(amount);
+            receiverAccount.Balance += amount;
+
+            Transactions newTransaction = new Transactions(
+                accountNumber: senderAccount.AccountNumber,
+                operation: Transactions.OperationType.Перевод,
+                timestamp: DateTime.Now,
+                isSuccessful: true,
+                amount: amount,
+                getterAccountNumber: receiverAccount.AccountNumber,
+                senderAccountName: senderUserName,
+                getterAccountName: receiverUserName
+            );
+
+            AddTransaction(newTransaction);
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine + 
+                                senderAccount.GetAccountInfo() + Environment.NewLine +
+                                senderCard.GetCardInfo();
+            OutputUserTextBox2.Text = "Выбранный пользователь:" + Environment.NewLine + 
+                                receiverAccount.GetAccountInfo() + Environment.NewLine +
+                                receiverCard.GetCardInfo();
+
+            MessageBox.Show("Перевод выполнен успешно!", "Успех", MessageBoxButton.OK);
+
+            AmountTextBox.Clear();
+            CardPINTextBox.Clear();
         }
 
         private void PurchaseWithCashbackButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null && CardComboBox.SelectedItem != null &&
-                double.TryParse(AmountTextBox.Text, out double amount) && amount > 0)
+            if (UserComboBox.SelectedItem == null || CardComboBox.SelectedItem == null)
             {
-                string selectedUserName = UserComboBox.SelectedItem.ToString();
-                var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == selectedUserName);
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
-                var selectedCard = selectedAccount?.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
-
-                if (selectedAccount != null && selectedCard != null)
-                {
-                    if (string.IsNullOrEmpty(CardPINTextBox.Text))
-                    {
-                        MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK); 
-                        return;
-                    }
-
-                    if (Convert.ToInt64(CardPINTextBox.Text) == selectedCard.PinCode)
-                    {
-                        if (selectedCard.CardBalance >= amount)
-                        {
-                            selectedCard.MakePurchaseWithCashback(amount);
-                            selectedAccount.Balance -= amount;
-                            selectedAccount.Balance += amount * (selectedCard.CashbackPercentage / 100);
-
-                            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                                        $"ФИО: {selectedUser.FullName}" + Environment.NewLine +
-                                                        $"Текущий баланс: {selectedAccount.Balance}" + Environment.NewLine +
-                                                        $"Паспорт: {selectedUser.PassportNumber}" + Environment.NewLine +
-                                                        $"Дата рождения: {selectedUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата открытия счета: {selectedAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Дата закрытия счета: {selectedAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                                        $"Номер счета: {selectedAccount.AccountNumber}" + Environment.NewLine +
-                                                        $"Статус счета: {selectedAccount.Status}" + Environment.NewLine +
-                                                        Environment.NewLine +
-                                                        $"Номер телефона: {selectedCard.PhoneNumber}" + Environment.NewLine +
-                                                        $"Номер карты: {selectedCard.CardNumber}" + Environment.NewLine +
-                                                        $"Баланс карты: {selectedCard.CardBalance}" + Environment.NewLine;
-
-                        }
-                        else
-                        {
-                            MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
-                    }
-
-                    AmountTextBox.Clear();
-                    CardPINTextBox.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("Сначала откройте счет и выберите карту!", "Ошибка", MessageBoxButton.OK);
-                }
+                MessageBox.Show("Выберите пользователя и карту!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
-            else
+
+            if (!double.TryParse(AmountTextBox.Text, out double amount) || amount <= 0)
             {
                 MessageBox.Show("Введите корректную сумму!", "Ошибка", MessageBoxButton.OK);
                 AmountTextBox.Clear();
+                return;
             }
-        }
 
+            string selectedUserName = UserComboBox.SelectedItem.ToString();
+            var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
+
+            if (selectedAccount == null)
+            {
+                MessageBox.Show("Сначала откройте счет!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem?.ToString());
+
+            if (selectedCard == null)
+            {
+                MessageBox.Show("Выберите корректную карту!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CardPINTextBox.Text))
+            {
+                MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (Convert.ToInt64(CardPINTextBox.Text) != selectedCard.PinCode)
+            {
+                MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (amount > selectedCard.CardBalance)
+            {
+                MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            selectedCard.MakePurchaseWithCashback(amount);
+            double cashback = amount * (selectedCard.CashbackPercentage / 100);
+            selectedAccount.Balance += cashback;
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine + selectedAccount.GetAccountInfo();
+
+            MessageBox.Show($"Покупка на {amount} выполнена успешно! Кэшбэк: {cashback}", "Успех", MessageBoxButton.OK);
+
+            AmountTextBox.Clear();
+            CardPINTextBox.Clear();
+        }
 
         private void TransactionTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -574,26 +546,20 @@ namespace Bank
                 }
 
                 var newCard = new BankCard(
-                    selectedUser.AccountNumber,
-                    DateTime.Now,
-                    selectedUser.FullName,
-                    selectedUser.PassportNumber,
-                    selectedUser.DateBirth,
-                    selectedUser.Balance,
-                    DateTime.Now.AddYears(5),
-                    "",
-                    0,
-                    pinCode,
-                    phoneNumber,
-                    3
+                    cardNumber: BankCard.GenerateCardNumber(),
+                    initialBalance: 0,
+                    pinCode: pinCode,
+                    phoneNumber: phoneNumber,
+                    cashbackPercentage: 3
                 );
 
-                newCard.CardNumber = newCard.GenerateCardNumber();
-
                 selectedUser.AddCard(newCard);
+
                 UpdateCardComboBox(selectedUser.Cards, CardComboBox);
+
                 PhoneNumberTextBox.Clear();
                 CardPINTextBox.Clear();
+
                 MessageBox.Show("Карта успешно создана!");
             }
         }
@@ -641,41 +607,35 @@ namespace Bank
             }
         }
 
-
         private void UserComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateSelectedUser(UserComboBox, CardComboBox, OutputUserTextBox);
+            UpdateSelectedUser(UserComboBox2, CardComboBox2, OutputUserTextBox2);
         }
 
         private void UserComboBox2_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            UpdateSelectedUser(UserComboBox, CardComboBox, OutputUserTextBox);
             UpdateSelectedUser(UserComboBox2, CardComboBox2, OutputUserTextBox2);
         }
 
         private void UpdateSelectedUser(ComboBox userComboBox, ComboBox cardComboBox, TextBox outputTextBox)
         {
-            if (userComboBox.SelectedItem is string selectedUserName)
+            if (userComboBox?.SelectedItem is string selectedUserName)
             {
                 var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == selectedUserName);
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
 
-                if (selectedUser != null && selectedAccount != null)
+                if (selectedUser != null)
                 {
                     outputTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
-                                         $"ФИО: {selectedUser.FullName}" + Environment.NewLine +
-                                         $"Текущий баланс: {selectedAccount.Balance}" + Environment.NewLine +
-                                         $"Паспорт: {selectedUser.PassportNumber}" + Environment.NewLine +
-                                         $"Дата рождения: {selectedUser.DateBirth.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                         $"Дата открытия счета: {selectedAccount.OpenDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                         $"Дата закрытия счета: {selectedAccount.EndDate.ToString("dd-MM-yyyy")}" + Environment.NewLine +
-                                         $"Номер счета: {selectedAccount.AccountNumber}" + Environment.NewLine +
-                                         $"Статус счета: {selectedAccount.Status}" + Environment.NewLine;
+                                          selectedUser.GetAccountInfo();
 
-                    UpdateCardComboBox(selectedAccount.Cards, cardComboBox);
+                    UpdateCardComboBox(selectedUser.Cards, cardComboBox);
                 }
                 else
                 {
                     outputTextBox.Text = "Пользователь не найден или у него нет счета.";
+                    cardComboBox.ItemsSource = null;
                 }
             }
         }
@@ -703,11 +663,9 @@ namespace Bank
 
                     if (selectedCard != null)
                     {
-                        outputTextBox.Text += Environment.NewLine +
-                                              $"Номер телефона: {selectedCard.PhoneNumber}" + Environment.NewLine +
-                                              $"Номер карты: {selectedCard.CardNumber}" + Environment.NewLine +
-                                              $"Баланс карты: {selectedCard.CardBalance}" + Environment.NewLine +
-                                              $"Кэшбэк: {selectedCard.CashbackPercentage}%";
+                        outputTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
+                                             selectedAccount.GetAccountInfo() + Environment.NewLine +
+                                             selectedCard.GetCardInfo();
                     }
                     else
                     {
