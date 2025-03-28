@@ -1,7 +1,8 @@
-﻿using System.Linq;
-using System;
+﻿using System;
+using System.Linq;
+using System.Windows;
 
-public class BankCard
+public class BankCard : BankAccount
 {
     public string CardNumber { get; set; }
     public double CardBalance { get; set; }
@@ -9,7 +10,9 @@ public class BankCard
     public string PhoneNumber { get; private set; }
     public double CashbackPercentage { get; private set; }
 
-    public BankCard(string cardNumber, double initialBalance, int pinCode, string phoneNumber, double cashbackPercentage)
+    public BankCard(string accountNumber, DateTime openDate, string fullName, string passportNumber, DateTime dateBirth, double balance, DateTime endDate,
+                    string cardNumber, double initialBalance, int pinCode, string phoneNumber, double cashbackPercentage)
+        : base(accountNumber, openDate, fullName, passportNumber, dateBirth, balance, endDate)
     {
         CardNumber = cardNumber;
         CardBalance = initialBalance;
@@ -26,21 +29,30 @@ public class BankCard
         return firstDigit.ToString() + otherDigits;
     }
 
-    public void Deposit(double amount)
+    new public void Deposit(double amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Сумма пополнения должна быть положительной.");
+        {
+            MessageBox.Show("Сумма пополнения должна быть положительной.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
 
         CardBalance += amount;
     }
 
-    public void Withdraw(double amount)
+    new public void Withdraw(double amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Сумма снятия должна быть положительной.");
+        {
+            MessageBox.Show("Сумма снятия должна быть положительной.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
 
         if (amount > CardBalance)
-            throw new InvalidOperationException("Недостаточно средств на карте.");
+        {
+            MessageBox.Show("Недостаточно средств на карте.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
 
         CardBalance -= amount;
     }
@@ -48,10 +60,16 @@ public class BankCard
     public void MakePurchaseWithCashback(double amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Сумма покупки должна быть положительной.");
+        {
+            MessageBox.Show("Сумма покупки должна быть положительной.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
 
         if (amount > CardBalance)
-            throw new InvalidOperationException("Недостаточно средств на карте.");
+        {
+            MessageBox.Show("Недостаточно средств на карте.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
 
         CardBalance -= amount;
         double cashback = amount * (CashbackPercentage / 100);

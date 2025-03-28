@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +29,7 @@ namespace Bank
         private List<Transactions> deposits = new List<Transactions>();
         private List<Transactions> withdrawals = new List<Transactions>();
         private List<Transactions> transfers = new List<Transactions>();
+        private List<Transactions> buys = new List<Transactions>();
 
         public MainWindow()
         {
@@ -35,13 +37,16 @@ namespace Bank
             BirthDatePicker.DisplayDateEnd = DateTime.Now.AddYears(-14);
             BirthDatePicker.DisplayDateStart = DateTime.Now.AddYears(-100);
             UpdateUserComboBox();
+            _ = GetRatesMethod();
+            tbFrom.Text = "0";
+            tbTo.Text = "0";
         }
 
         private void OpenAccountButton(object sender, RoutedEventArgs e)
         {
             string fullName = FullNameTextBox.Text;
             string passport = PassportTextBox.Text;
-            DateTime? birthDate = BirthDatePicker.SelectedDate;
+            DateTime ? birthDate  = BirthDatePicker.SelectedDate;
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(passport) || birthDate == null)
             {
@@ -143,7 +148,7 @@ namespace Bank
             }
 
             selectedCard.Deposit(amount);
-            selectedAccount.Balance += amount;
+            selectedAccount.Deposit(amount);
 
             Transactions newTransaction = new Transactions(
                 accountNumber: selectedAccount.AccountNumber,
@@ -209,7 +214,7 @@ namespace Bank
                 MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
-
+            
             if (selectedCard.CardBalance < amount)
             {
                 MessageBox.Show("Недостаточно средств на карте!", "Ошибка", MessageBoxButton.OK);
@@ -217,7 +222,7 @@ namespace Bank
             }
 
             selectedCard.Withdraw(amount);
-            selectedAccount.Balance -= amount;
+            selectedAccount.Withdraw(amount);
 
             Transactions newTransaction = new Transactions(
                 accountNumber: selectedAccount.AccountNumber,
@@ -282,13 +287,13 @@ namespace Bank
                 return;
             }
 
-            if (string.IsNullOrEmpty(CardPINTextBox.Text))
+            if (string.IsNullOrEmpty(CardPINTextBox.Text) || !int.TryParse(CardPINTextBox.Text, out int enteredPin))
             {
-                MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
+                MessageBox.Show("Введите корректный PIN-код!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
-            if (Convert.ToInt64(CardPINTextBox.Text) != senderCard.PinCode)
+            if (enteredPin != senderCard.PinCode)
             {
                 MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -301,9 +306,9 @@ namespace Bank
             }
 
             senderCard.Withdraw(amount);
-            senderAccount.Balance -= amount;
+            senderAccount.Withdraw(amount);
             receiverCard.Deposit(amount);
-            receiverAccount.Balance += amount;
+            receiverAccount.Deposit(amount);
 
             Transactions newTransaction = new Transactions(
                 accountNumber: senderAccount.AccountNumber,
@@ -363,13 +368,13 @@ namespace Bank
                 return;
             }
 
-            if (string.IsNullOrEmpty(CardPINTextBox.Text))
+            if (string.IsNullOrEmpty(CardPINTextBox.Text) || !int.TryParse(CardPINTextBox.Text, out int enteredPin))
             {
-                MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
+                MessageBox.Show("Введите корректный PIN-код!", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
-            if (Convert.ToInt64(CardPINTextBox.Text) != selectedCard.PinCode)
+            if (enteredPin != selectedCard.PinCode)
             {
                 MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
                 return;
@@ -382,10 +387,25 @@ namespace Bank
             }
 
             selectedCard.MakePurchaseWithCashback(amount);
+            selectedAccount.Balance -= amount;
             double cashback = amount * (selectedCard.CashbackPercentage / 100);
             selectedAccount.Balance += cashback;
 
-            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine + selectedAccount.GetAccountInfo();
+            Transactions newTransaction = new Transactions(
+                accountNumber: selectedAccount.AccountNumber,
+                operation: Transactions.OperationType.Покупка,
+                timestamp: DateTime.Now,
+                isSuccessful: true,
+                amount: amount,
+                getterAccountNumber: selectedAccount.AccountNumber,
+                senderAccountName: selectedUserName,
+                getterAccountName: selectedUserName);
+
+            AddTransaction(newTransaction);
+
+            OutputUserTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
+                                selectedAccount.GetAccountInfo() + Environment.NewLine +
+                                selectedCard.GetCardInfo();
 
             MessageBox.Show($"Покупка на {amount} выполнена успешно! Кэшбэк: {cashback}", "Успех", MessageBoxButton.OK);
 
@@ -420,7 +440,7 @@ namespace Bank
 
             var selectedType = (TransactionTypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-            var allTransactions = deposits.Concat(withdrawals).Concat(transfers).ToList();
+            var allTransactions = deposits.Concat(withdrawals).Concat(transfers).Concat(buys).ToList();
 
             allTransactions = allTransactions.Where(t => t.AccountNumber == account.AccountNumber).ToList();
 
@@ -439,6 +459,8 @@ namespace Bank
                         return t.Operation == Transactions.OperationType.Снятие;
                     case "Перевод":
                         return t.Operation == Transactions.OperationType.Перевод;
+                    case "Покупка с кешбеком":
+                        return t.Operation == Transactions.OperationType.Покупка;
                     default:
                         return false;
                 }
@@ -459,6 +481,9 @@ namespace Bank
                     break;
                 case Transactions.OperationType.Перевод:
                     transfers.Add(transaction);
+                    break;
+                case Transactions.OperationType.Покупка:
+                    buys.Add(transaction);
                     break;
                 default:
                     throw new InvalidOperationException("Неизвестный тип транзакции.");
@@ -485,25 +510,25 @@ namespace Bank
                 return;
             }
 
-            StringBuilder output = new StringBuilder();
+            string output = "";
 
             foreach (var transaction in transactionList)
             {
-                output.AppendLine(transaction.OutputTransaction());
+                output += transaction.OutputTransaction() + Environment.NewLine;
 
                 if (transaction.Operation == Transactions.OperationType.Перевод)
                 {
-                    output.AppendLine("Отправитель: " + transaction.SenderAccountName);
-                    output.AppendLine("Перевод на счет: " + transaction.GetterAccountNumber);
-                    output.AppendLine("Получатель: " + transaction.GetterAccountName);
+                    output += "Отправитель: " + transaction.SenderAccountName + Environment.NewLine;
+                    output += "Перевод на счет: " + transaction.GetterAccountNumber + Environment.NewLine;
+                    output += "Получатель: " + transaction.GetterAccountName + Environment.NewLine;
                 }
 
-                output.AppendLine();
+                output += Environment.NewLine;
             }
 
             Dispatcher.Invoke(() =>
             {
-                outputTransactionsTextBox.Text = output.ToString();
+                outputTransactionsTextBox.Text = output;
             });
         }
 
@@ -518,15 +543,15 @@ namespace Bank
             string phoneNumber = PhoneNumberTextBox.Text;
             string pinCodeText = CardPINTextBox.Text;
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^\+7\d{10}$"))
-            {
-                MessageBox.Show("Номер телефона должен быть в формате +7XXXXXXXXXX.");
-                return;
-            }
-
             if (string.IsNullOrEmpty(phoneNumber) || pinCodeText.Length != 4)
             {
                 MessageBox.Show("Пожалуйста, введите номер телефона и 4-значный PIN-код.");
+                return;
+            }
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^\+7\d{10}$"))
+            {
+                MessageBox.Show("Номер телефона должен быть в формате +7XXXXXXXXXX.");
                 return;
             }
 
@@ -546,6 +571,13 @@ namespace Bank
                 }
 
                 var newCard = new BankCard(
+                    accountNumber: selectedUser.AccountNumber,
+                    openDate: selectedUser.OpenDate,
+                    fullName: selectedUser.FullName,
+                    passportNumber: selectedUser.PassportNumber,
+                    dateBirth: selectedUser.DateBirth,
+                    balance: selectedUser.Balance,
+                    endDate: selectedUser.EndDate,
                     cardNumber: BankCard.GenerateCardNumber(),
                     initialBalance: 0,
                     pinCode: pinCode,
@@ -566,45 +598,53 @@ namespace Bank
 
         private void RemoveCardButton(object sender, RoutedEventArgs e)
         {
-            if (UserComboBox.SelectedItem != null && CardComboBox.SelectedItem != null)
-            {
-                string selectedUserName = UserComboBox.SelectedItem.ToString();
-                var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
-
-                if (selectedAccount != null)
-                {
-                    var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem.ToString());
-
-                    if (selectedCard != null)
-                    {
-                        if (selectedAccount.Cards.Count > 1)
-                        {
-                            selectedAccount.Cards.Remove(selectedCard);
-                            MessageBox.Show("Карта успешно удалена!", "Успех", MessageBoxButton.OK);
-
-                            CardComboBox.Items.Clear();
-                            CardComboBox.ItemsSource = selectedAccount.Cards.Select(card => card.CardNumber).ToList();
-
-                        }
-                        else
-                        {
-                            MessageBox.Show("Нельзя удалить единственную карту!", "Ошибка", MessageBoxButton.OK);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Выбранная карта не найдена!", "Ошибка", MessageBoxButton.OK);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Пользователь не найден!", "Ошибка", MessageBoxButton.OK);
-                }
-            }
-            else
+            if (UserComboBox.SelectedItem == null || CardComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите пользователя и карту!", "Ошибка", MessageBoxButton.OK);
+                return;
             }
+
+            string selectedUserName = UserComboBox.SelectedItem.ToString();
+            var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUserName);
+            var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == CardComboBox.SelectedItem as string);
+
+            if (selectedAccount == null)
+            {
+                MessageBox.Show("Пользователь не найден!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (selectedCard == null)
+            {
+                MessageBox.Show("Карта не выбрана!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (selectedAccount.Cards.Count == 1)
+            {
+                MessageBox.Show("Нельзя удалить единственную карту!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CardPINTextBox.Text))
+            {
+                MessageBox.Show("Введите PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            if (!int.TryParse(CardPINTextBox.Text, out int enteredPin) || enteredPin != selectedCard.PinCode)
+            {
+                MessageBox.Show("Неверный PIN-код!", "Ошибка", MessageBoxButton.OK);
+                return;
+            }
+
+            selectedAccount.Cards.Remove(selectedCard);
+            selectedAccount.UpdateAccountBalance();
+
+            MessageBox.Show("Карта успешно удалена!", "Успех", MessageBoxButton.OK);
+
+            CardPINTextBox.Clear();
+            UpdateCardComboBox(selectedAccount.Cards, CardComboBox);
         }
 
         private void UserComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -656,11 +696,10 @@ namespace Bank
             {
                 var selectedUser = BankAccounts.FirstOrDefault(user => user.FullName == userComboBox.SelectedItem as string);
                 var selectedAccount = BankAccounts.FirstOrDefault(acc => acc.FullName == selectedUser?.FullName);
+                var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == selectedCardNumber);
 
                 if (selectedAccount != null)
                 {
-                    var selectedCard = selectedAccount.Cards.FirstOrDefault(card => card.CardNumber == selectedCardNumber);
-
                     if (selectedCard != null)
                     {
                         outputTextBox.Text = "Выбранный пользователь:" + Environment.NewLine +
@@ -669,7 +708,7 @@ namespace Bank
                     }
                     else
                     {
-                        outputTextBox.Text += "\nКарта не найдена.";
+                        outputTextBox.Text += Environment.NewLine + "Карта не найдена.";
                     }
                 }
             }
@@ -719,30 +758,136 @@ namespace Bank
             {
                 string resultJson = JsonConvert.SerializeObject(BankAccounts, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(AccountsFile, resultJson);
-                MessageBox.Show("Данные успешно записаны в JSON!", "Успех", MessageBoxButton.OK);
+                MessageBox.Show("Данные успешно записаны в JSON!");
             }
             catch
             {
-                MessageBox.Show("Ошибка сохранения!", "Ошибка", MessageBoxButton.OK);
+                MessageBox.Show("Ошибка сохранения!");
             }
         }
 
         private void LoadUsersButton(object sender, RoutedEventArgs e)
         {
-            try
+            if (File.Exists(AccountsFile))
             {
-                if (File.Exists(AccountsFile))
-                {
-                    string resultJson = File.ReadAllText(AccountsFile);
-                    BankAccounts = JsonConvert.DeserializeObject<List<BankAccount>>(resultJson);
-                    MessageBox.Show("Данные успешно считаны из JSON!", "Успех", MessageBoxButton.OK);
+                string resultJson = File.ReadAllText(AccountsFile);
+                BankAccounts = JsonConvert.DeserializeObject<List<BankAccount>>(resultJson);
+                MessageBox.Show("Данные успешно считаны из JSON!");
 
-                    UpdateUserComboBox();
-                }
+                UpdateUserComboBox();
             }
-            catch
+            else
             {
-                MessageBox.Show("Ошибка при загрузке данных", "Ошибка", MessageBoxButton.OK);
+                MessageBox.Show("Ошибка при загрузке данных");
+            }
+        }
+
+        public class CurrencyRate
+        {
+            public string ID { get; set; }
+            public string NumCode { get; set; }
+            public string CharCode { get; set; }
+            public int Nominal { get; set; }
+            public string Name { get; set; }
+            public double Value { get; set; }
+            public double Previous { get; set; }
+        }
+
+        public class ExchangeRatesResponse
+        {
+            public DateTime Date { get; set; }
+            public DateTime PreviousDate { get; set; }
+            public string PreviousURL { get; set; }
+            public DateTime Timestamp { get; set; }
+            public Dictionary<string, CurrencyRate> Valute { get; set; }
+        }
+
+        private Dictionary<string, CurrencyRate> currencyRates = new Dictionary<string, CurrencyRate>();
+        HttpClient client = new HttpClient();
+        const string url = "https://www.cbr-xml-daily.ru/daily_json.js";
+
+        private async Task GetRatesMethod()
+        {
+            string json = await client.GetStringAsync(url);
+            ExchangeRatesResponse rates = JsonConvert.DeserializeObject<ExchangeRatesResponse>(json);
+
+            if (rates != null && rates.Valute != null)
+            {
+                currencyRates = rates.Valute;
+
+                currencyRates["RUB"] = new CurrencyRate
+                {
+                    CharCode = "RUB",
+                    Name = "Российский рубль",
+                    Nominal = 1,
+                    Value = 1
+                };
+
+                foreach (var currency in currencyRates)
+                {
+                    comboBoxFrom.Items.Add(currency.Key);
+                    comboBoxTo.Items.Add(currency.Key);
+                }
+
+                comboBoxFrom.SelectedItem = "USD";
+                comboBoxTo.SelectedItem = "RUB";
+            }
+        }
+
+        public void Convert()
+        {
+            if (comboBoxFrom.SelectedItem == null || comboBoxTo.SelectedItem == null) return;
+
+            string fromCurrency = comboBoxFrom.SelectedValue.ToString();
+            string toCurrency = comboBoxTo.SelectedValue.ToString();
+
+            if (tbFrom.Text.Contains("."))
+            {
+                MessageBox.Show("Точка не может быть разделителем", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                tbFrom.Text = null;
+                tbTo.Text = null;
+                return;
+            }
+
+            if (!double.TryParse(tbFrom.Text, out double amount))
+            {
+                MessageBox.Show("Введите корректную сумму.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                tbFrom.Text = null;
+                tbTo.Text = null;
+                return;
+            }
+
+            double rateFrom = currencyRates[fromCurrency].Value / currencyRates[fromCurrency].Nominal;
+            double rateTo = currencyRates[toCurrency].Value / currencyRates[toCurrency].Nominal;
+
+            double result = amount * (rateFrom / rateTo);
+            tbTo.Text = result.ToString("F2");
+        }
+
+        private void ChangeBtn(object sender, RoutedEventArgs e)
+        {
+            object cbTo = comboBoxTo.SelectedItem;
+            comboBoxTo.SelectedItem = comboBoxFrom.SelectedItem;
+            comboBoxFrom.SelectedItem = cbTo;
+            tbTo.Text = "0";
+
+            Convert();
+        }
+
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Convert();
+        }
+
+        private void tbFrom_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tbFrom.Text))
+            {
+                tbFrom.Text = "0";
+            }
+            else
+            {
+                Convert();
             }
         }
     }

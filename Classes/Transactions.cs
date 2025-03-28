@@ -13,7 +13,7 @@ namespace Bank.Classes
         public DateTime Timestamp { get; set; }
         public bool IsSuccessful { get; set; }
         public double Amount { get; set; }
-        public enum OperationType { Снятие, Пополнение, Перевод }
+        public enum OperationType { Снятие, Пополнение, Перевод, Покупка }
         public string GetterAccountNumber { get; set; }
         public string GetterAccountName { get; set; }
         public string SenderAccountName { get; set; }
@@ -32,11 +32,11 @@ namespace Bank.Classes
 
         public string OutputTransaction()
         {
-            string transactionInfo = "Операция: " + this.Operation + Environment.NewLine +
-                                     "Счет: " + this.AccountNumber + Environment.NewLine +
-                                     "Сумма: " + this.Amount + Environment.NewLine +
-                                     "Результат транзакции: " + (this.IsSuccessful ? "успешно" : "неудача") + Environment.NewLine +
-                                     "Дата: " + this.Timestamp.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine;
+            string transactionInfo = $"Операция: {this.Operation}{Environment.NewLine}" +
+                                     $"Счет: {this.AccountNumber}{Environment.NewLine}" +
+                                     $"Сумма: {this.Amount}{Environment.NewLine}" +
+                                     $"Результат транзакции: {(this.IsSuccessful ? "успешно" : "неудача")}{Environment.NewLine}" +
+                                     $"Дата: {this.Timestamp.ToString("dd-MM-yyyy HH:mm:ss")}{Environment.NewLine}";
 
             return transactionInfo;
         }

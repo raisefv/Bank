@@ -41,11 +41,11 @@
         <Button Content="Сохранить пользователей" Click="SaveUsersButton" HorizontalAlignment="Left" Margin="603,7,0,0" VerticalAlignment="Top" Width="150" Height="40"/>
         <Button Content="Загрузить пользователей" Click="LoadUsersButton" HorizontalAlignment="Left" Margin="408,7,0,0" VerticalAlignment="Top" Width="150" Height="40"/>
 
-        <ComboBox x:Name="TransactionTypeComboBox" SelectionChanged="TransactionTypeComboBox_SelectionChanged" Margin="516,67,132,666">
+        <ComboBox x:Name="TransactionTypeComboBox" SelectionChanged="TransactionTypeComboBox_SelectionChanged" Margin="516,67,122,666">
             <ComboBoxItem Content="Пополнение" IsSelected="True" />
             <ComboBoxItem Content="Снятие" />
             <ComboBoxItem Content="Перевод" />
-            <ComboBoxItem Content="Оплата покупки" />
+            <ComboBoxItem Content="Покупка с кешбеком" />
         </ComboBox>
         <TextBox HorizontalAlignment="Left" Name="OutputTransactionsTextBox" IsReadOnly="True" Margin="408,122,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="345" Height="123"/>
 
@@ -61,6 +61,17 @@
 
         <Button Content="Создать карту" Click="CreateCardButton" HorizontalAlignment="Left" Margin="10,204,0,0" VerticalAlignment="Top" Width="120" Height="40"/>
         <Button Content="Удалить карту" Click="RemoveCardButton" HorizontalAlignment="Left" Margin="135,204,0,0" VerticalAlignment="Top" Width="120" Height="40"/>
+        
+        <Label Content="Конвертировать из:" HorizontalAlignment="Left" Margin="445,250,0,0" VerticalAlignment="Top"/>
+        <Label Content="Конвертировать в:" HorizontalAlignment="Left" Margin="628,250,0,0" VerticalAlignment="Top"/>
+
+        <ComboBox SelectionChanged="comboBox_SelectionChanged" Name="comboBoxFrom" HorizontalAlignment="Left" Margin="455,277,0,0" VerticalAlignment="Top" Width="100"/>
+        <ComboBox SelectionChanged="comboBox_SelectionChanged" Name="comboBoxTo" HorizontalAlignment="Left" Margin="628,276,0,0" VerticalAlignment="Top" Width="100"/>
+
+        <TextBox HorizontalAlignment="Left" TextChanged="tbFrom_TextChanged" Name="tbFrom" Margin="455,306,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox HorizontalAlignment="Left" Name="tbTo" IsReadOnly="True" Margin="608,306,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+        <Button Content="Изменить" Click="ChangeBtn" HorizontalAlignment="Left" Margin="563,278,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

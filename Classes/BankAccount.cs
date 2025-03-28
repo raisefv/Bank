@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 public class BankAccount
 {
@@ -37,6 +38,34 @@ public class BankAccount
         UpdateAccountBalance();
     }
 
+    public void Deposit(double amount)
+    {
+        if (amount <= 0)
+        {
+            MessageBox.Show("Сумма пополнения должна быть положительной.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
+
+        Balance += amount;
+    }
+
+    public void Withdraw(double amount)
+    {
+        if (amount <= 0)
+        {
+            MessageBox.Show("Сумма снятия должна быть положительной.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
+
+        if (amount > Balance)
+        {
+            MessageBox.Show("Недостаточно средств на карте.", "Ошибка", MessageBoxButton.OK);
+            return;
+        }
+
+        Balance -= amount;
+    }
+
     public void UpdateAccountBalance()
     {
         Balance = Cards.Sum(card => card.CardBalance);
@@ -53,7 +82,7 @@ public class BankAccount
     public void CloseAccount()
     {
         if (Balance > 0)
-            throw new InvalidOperationException("Нельзя закрыть счет с ненулевым балансом.");
+            MessageBox.Show("Нельзя закрыть счет с ненулевым балансом.");
 
         Status = AccountStatus.Закрыт;
     }
@@ -72,7 +101,7 @@ public class BankAccount
     public static BankAccount operator +(BankAccount account, double amount)
     {
         if (amount < 0)
-            throw new ArgumentException("Сумма пополнения должна быть положительной.");
+            MessageBox.Show("Сумма пополнения должна быть положительной.");
 
         account.Balance += amount;
         return account;
@@ -81,10 +110,10 @@ public class BankAccount
     public static BankAccount operator -(BankAccount account, double amount)
     {
         if (amount < 0)
-            throw new ArgumentException("Сумма списания должна быть положительной.");
+            MessageBox.Show("Сумма списания должна быть положительной.");
 
         if (amount > account.Balance)
-            throw new InvalidOperationException("Недостаточно средств на счете.");
+            MessageBox.Show("Недостаточно средств на счете.");
 
         account.Balance -= amount;
         return account;
